@@ -1,34 +1,44 @@
+import { pipeline } from "node:stream";
 import { db } from "../index.js";
-import { NewPipeline } from "../schema.js";
+import { NewPipeline, pipelines } from "../schema.js";
 import { and, eq, sql } from "drizzle-orm";
 export async function createPipeline(data: NewPipeline) {
-  
+  const result = await db.insert(pipelines).values(data).returning();
+  return result[0] || null;
 }
 
 export async function getAllPipelines() {
-  // TODO: implement Drizzle select from `pipelines` table
-  throw new Error("Not implemented");
+  const results = await db.select().from(pipelines);
+  return results;
 }
 
-
 export async function getPipelineById(id: string) {
-  // TODO: implement Drizzle select from `pipelines` table where id = ?
-  throw new Error("Not implemented");
+  const result = await db
+    .select()
+    .from(pipelines)
+    .where(eq(pipelines.id, id))
+    .limit(1);
+  return result[0] || null;
 }
 
 export async function getPipelineByPathToken(token: string) {
-  // TODO: implement Drizzle select from `pipelines` table where path_token = ?
-  throw new Error("Not implemented");
+  const result = await db
+    .select()
+    .from(pipelines)
+    .where(eq(pipelines.pathToken, token))
+    .limit(1);
+  return result[0] || null;
 }
-
 
 export async function updatePipeline(id: string, data: any) {
-  // TODO: implement Drizzle update on `pipelines` table
-  throw new Error("Not implemented");
+  const result = await db
+    .update(pipelines)
+    .set(data)
+    .where(eq(pipelines.id, id))
+    .returning();
+  return result[0] || null;
 }
 
-
 export async function deletePipeline(id: string) {
-  // TODO: implement Drizzle delete on `pipelines` table
-  throw new Error("Not implemented");
+  await db.delete(pipelines).where(eq(pipelines.id, id));
 }
