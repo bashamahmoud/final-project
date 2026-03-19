@@ -25,7 +25,7 @@ export function errorHandler(
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) {
   if (err instanceof BadRequestError) {
     return res.status(400).json({ error: err.message });
