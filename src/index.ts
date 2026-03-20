@@ -1,4 +1,5 @@
 import express from "express";
+import process from "node:process";
 import { healthHandler } from "./api/health.js";
 import { errorHandler, middlewareLogResponses } from "./api/middleware.js";
 import { pipelinesRouter } from "./api/pipelines.js";
