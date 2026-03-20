@@ -1,7 +1,7 @@
-import { pipeline } from "node:stream";
 import { db } from "../index.js";
 import { NewPipeline, pipelines } from "../schema.js";
-import { and, eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
+
 export async function createPipeline(data: NewPipeline) {
   const result = await db.insert(pipelines).values(data).returning();
   return result[0] || null;
@@ -30,7 +30,7 @@ export async function getPipelineByPathToken(token: string) {
   return result[0] || null;
 }
 
-export async function updatePipeline(id: string, data: any) {
+export async function updatePipeline(id: string, data: Partial<NewPipeline>) {
   const result = await db
     .update(pipelines)
     .set(data)
