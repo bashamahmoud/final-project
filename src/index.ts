@@ -5,6 +5,8 @@ import { pipelinesRouter } from "./api/pipelines.js";
 import { webhooksRouter } from "./api/webhooks.js";
 import { startWorker } from "./worker/index.js";
 import { jobsRouter } from "./api/jobs.js";
+import { actionsRouter } from "./api/actions.js";
+import { subscribersRouter } from "./api/subscribers.js";
 
 const app = express();
 const port = process.env.PORT ?? 8080;
@@ -37,6 +39,22 @@ app.use("/api/webhooks", async (req, res, next) => {
 app.use("/api/jobs", async (req, res, next) => {
   try {
     await jobsRouter(req, res, next);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.use("/api/actions", async (req, res, next) => {
+  try {
+    await actionsRouter(req, res, next);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.use("/api/subscribers", async (req, res, next) => {
+  try {
+    await subscribersRouter(req, res, next);
   } catch (err) {
     next(err);
   }
