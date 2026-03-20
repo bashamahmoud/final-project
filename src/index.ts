@@ -4,6 +4,7 @@ import { errorHandler, middlewareLogResponses } from "./api/middleware.js";
 import { pipelinesRouter } from "./api/pipelines.js";
 import { webhooksRouter } from "./api/webhooks.js";
 import { startWorker } from "./worker/index.js";
+import { jobsRouter } from "./api/jobs.js";
 
 const app = express();
 const port = process.env.PORT ?? 8080;
@@ -28,6 +29,14 @@ app.use("/api/pipelines", async (req, res, next) => {
 app.use("/api/webhooks", async (req, res, next) => {
   try {
     await webhooksRouter(req, res, next);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.use("/api/jobs", async (req, res, next) => {
+  try {
+    await jobsRouter(req, res, next);
   } catch (err) {
     next(err);
   }
