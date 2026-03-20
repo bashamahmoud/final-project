@@ -1,7 +1,7 @@
 import { claimJob, updateJobStatus, saveJobResult } from "../db/query/jobs.js";
 import { getActionsForPipeline } from "../db/query/pipeline_actions.js";
 import { runActions } from "./actions.js";
-
+import { processDeliveries } from "./deliveryService.js";
 export async function processNextJob() {
   const job = await claimJob();
 
@@ -29,6 +29,8 @@ export async function processNextJob() {
     });
 
     await updateJobStatus(job.id, "succeeded");
+
+    await processDeliveries(job.id, job.pipelineId, resultPayload);
 
     console.log(`Job ${job.id} succeeded.`);
     return true;
