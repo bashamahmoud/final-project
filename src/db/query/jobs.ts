@@ -1,6 +1,7 @@
 import { db } from "../index.js";
 import { jobs, NewJob } from "../schema.js";
 import { eq, asc } from "drizzle-orm";
+import { jobResults, NewJobResult } from "../schema.js";
 
 export async function enqueueJob(data: NewJob) {
   const result = await db.insert(jobs).values(data).returning();
@@ -42,5 +43,10 @@ export async function updateJobStatus(
     })
     .where(eq(jobs.id, id))
     .returning();
+  return result[0] || null;
+}
+
+export async function saveJobResult(data: NewJobResult) {
+  const result = await db.insert(jobResults).values(data).returning();
   return result[0] || null;
 }
