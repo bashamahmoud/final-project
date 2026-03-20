@@ -1,27 +1,40 @@
 type ActionParams = {
   type: string;
-  config: any;
+  config: unknown;
 };
 
-export async function runActions(actions: ActionParams[], initialPayload: any) {
+export async function runActions(
+  actions: ActionParams[],
+  initialPayload: Record<string, unknown>,
+) {
   let currentPayload = { ...initialPayload };
 
-  const rawMessageText = 
-    currentPayload?.message?.text || 
-    currentPayload?.text || 
-    (typeof currentPayload === "string" ? currentPayload : JSON.stringify(currentPayload)) || 
+  const typedPayload = currentPayload as {
+    message?: { text?: string };
+    text?: string;
+  };
+  const rawMessageText =
+    typedPayload?.message?.text ||
+    typedPayload?.text ||
+    (typeof currentPayload === "string"
+      ? currentPayload
+      : JSON.stringify(currentPayload)) ||
     "";
-    
+
   let lowerText = String(rawMessageText).toLowerCase();
-  
+
   if (lowerText === "[object object]") {
-      lowerText = JSON.stringify(currentPayload).toLowerCase();
+    lowerText = JSON.stringify(currentPayload).toLowerCase();
   }
 
   for (const action of actions) {
     if (action.type === "RESERVATION") {
-      const isReservation = lowerText.includes("book") || lowerText.includes("table") || lowerText.includes("reserve") || lowerText.includes("people");
-      
+      const isReservation =
+        lowerText.includes("book") ||
+        lowerText.includes("table") ||
+        lowerText.includes("reserve") ||
+        lowerText.includes("people");
+
       if (isReservation) {
         const partyMatch = lowerText.match(/(\d+)\s*people/);
         const dateMatch = lowerText.match(/on\s+(\w+)/);
@@ -33,7 +46,7 @@ export async function runActions(actions: ActionParams[], initialPayload: any) {
           partySize: partyMatch ? parseInt(partyMatch[1], 10) : null,
           requestedDate: dateMatch ? dateMatch[1] : null,
           requestedTime: timeMatch ? timeMatch[1] : null,
-          parsedAt: new Date().toISOString()
+          parsedAt: new Date().toISOString(),
         };
       }
     }
