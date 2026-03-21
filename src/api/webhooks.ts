@@ -4,6 +4,29 @@ import { enqueueJob } from "../db/query/jobs.js";
 
 export const webhooksRouter = Router();
 
+// Facebook verification route
+webhooksRouter.get(
+  "/:token",
+  async (req: Request<{ token: string }>, res: Response) => {
+    try {
+      const mode = req.query["hub.mode"];
+      const verifyToken = req.query["hub.verify_token"];
+      const challenge = req.query["hub.challenge"];
+
+      if (mode === "subscribe" && verifyToken === process.env.FB_VERIFY_TOKEN) {
+        console.log(`[FB-Verify] Webhook verified successfully!`);
+        res.status(200).send(challenge);
+      } else {
+        console.error("[FB-Verify] Verification failed. Tokens didn't match.");
+        res.sendStatus(403);
+      }
+    } catch (error) {
+      console.error("Error during webhook verification:", error);
+      res.status(500).send("Verification failed.");
+    }
+  },
+);
+
 webhooksRouter.post(
   "/:token",
   async (req: Request<{ token: string }>, res: Response) => {
