@@ -25,9 +25,9 @@ subscribersRouter.post("/", async (req: Request, res: Response) => {
     const { pipelineId, targetUrl, filters } = req.body;
 
     if (!pipelineId || !targetUrl || !filters) {
-      res
-        .status(400)
-        .json({ error: "Missing required fields: pipelineId, targetUrl, filters" });
+      res.status(400).json({
+        error: "Missing required fields: pipelineId, targetUrl, filters",
+      });
       return;
     }
 
