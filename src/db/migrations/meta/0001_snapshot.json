@@ -77,12 +77,8 @@
           "name": "delivery_attempts_job_id_jobs_id_fk",
           "tableFrom": "delivery_attempts",
           "tableTo": "jobs",
-          "columnsFrom": [
-            "job_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["job_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -90,12 +86,8 @@
           "name": "delivery_attempts_subscriber_id_pipeline_subscribers_id_fk",
           "tableFrom": "delivery_attempts",
           "tableTo": "pipeline_subscribers",
-          "columnsFrom": [
-            "subscriber_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["subscriber_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -143,12 +135,8 @@
           "name": "job_results_job_id_jobs_id_fk",
           "tableFrom": "job_results",
           "tableTo": "jobs",
-          "columnsFrom": [
-            "job_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["job_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -221,12 +209,8 @@
           "name": "jobs_pipeline_id_pipelines_id_fk",
           "tableFrom": "jobs",
           "tableTo": "pipelines",
-          "columnsFrom": [
-            "pipeline_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["pipeline_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -286,12 +270,8 @@
           "name": "pipeline_actions_pipeline_id_pipelines_id_fk",
           "tableFrom": "pipeline_actions",
           "tableTo": "pipelines",
-          "columnsFrom": [
-            "pipeline_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["pipeline_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -345,12 +325,8 @@
           "name": "pipeline_subscribers_pipeline_id_pipelines_id_fk",
           "tableFrom": "pipeline_subscribers",
           "tableTo": "pipelines",
-          "columnsFrom": [
-            "pipeline_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["pipeline_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -418,9 +394,7 @@
         "pipelines_path_token_unique": {
           "name": "pipelines_path_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "path_token"
-          ]
+          "columns": ["path_token"]
         }
       },
       "policies": {},
