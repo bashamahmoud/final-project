@@ -13,14 +13,11 @@ webhooksRouter.get(
       const verifyToken = req.query["hub.verify_token"];
       const challenge = req.query["hub.challenge"];
 
-
       if (mode === "subscribe" && verifyToken === process.env.FB_VERIFY_TOKEN) {
         console.log(`[FB-Verify] Webhook verified successfully!`);
         res.status(200).send(challenge);
       } else {
-        console.error(
-          "[FB-Verify] Verification failed. Tokens didn't match.",
-        );
+        console.error("[FB-Verify] Verification failed. Tokens didn't match.");
         res.sendStatus(403);
       }
     } catch (error) {
