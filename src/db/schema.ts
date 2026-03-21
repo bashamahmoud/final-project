@@ -36,6 +36,7 @@ export const pipelineSubscribers = pgTable("pipeline_subscribers", {
     .references(() => pipelines.id)
     .notNull(),
   targetUrl: text("target_url").notNull(),
+  filters: jsonb("filters"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export type NewPipelineSubscriber = typeof pipelineSubscribers.$inferInsert;
