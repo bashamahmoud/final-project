@@ -12,6 +12,29 @@ export async function processDeliveries(
   const subscribers = await getSubscribersByPipeline(pipelineId);
 
   for (const subscriber of subscribers) {
+    let shouldDeliver = true;
+
+    if (subscriber.filters && typeof subscriber.filters === "object") {
+      const filters = subscriber.filters as Record<string, unknown>;
+
+      if (Object.keys(filters).length > 0) {
+        const payloadMap = new Map(Object.entries(payload || {}));
+        for (const [key, expectedValue] of Object.entries(filters)) {
+          if (payloadMap.get(key) !== expectedValue) {
+            shouldDeliver = false;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!shouldDeliver) {
+      console.log(
+        `[Worker] Skipped delivery to subscriber ${subscriber.id} for job ${jobId} due to filter rules.`,
+      );
+      continue;
+    }
+
     const attempt = await createDeliveryAttempt({
       jobId,
       subscriberId: subscriber.id,

@@ -22,18 +22,19 @@ subscribersRouter.get(
 
 subscribersRouter.post("/", async (req: Request, res: Response) => {
   try {
-    const { pipelineId, targetUrl } = req.body;
+    const { pipelineId, targetUrl, filters } = req.body;
 
-    if (!pipelineId || !targetUrl) {
-      res
-        .status(400)
-        .json({ error: "Missing required fields: pipelineId, targetUrl" });
+    if (!pipelineId || !targetUrl || !filters) {
+      res.status(400).json({
+        error: "Missing required fields: pipelineId, targetUrl, filters",
+      });
       return;
     }
 
     const newSubscriber = await createSubscriber({
       pipelineId,
       targetUrl,
+      filters,
     });
 
     res.status(201).json(newSubscriber);
