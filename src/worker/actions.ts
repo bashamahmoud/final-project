@@ -63,6 +63,8 @@ export async function runActions(
         lowerText.includes("refund") ||
         lowerText.includes("waiting") ||
         lowerText.includes("issue") ||
+        lowerText.includes("support") ||
+        lowerText.includes("help") ||
         lowerText.includes("terrible");
 
       if (isSupport) {
