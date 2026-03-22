@@ -34,11 +34,6 @@ export async function processNextJob() {
       resultPayload,
     });
 
-    if (resultPayload.category === "unclassified") {
-      await updateJobStatus(job.id, "ignored", "Message ignored: unclassified");
-      return true;
-    }
-
     await processDeliveries(job.id, job.pipelineId, resultPayload);
     await updateJobStatus(job.id, "succeeded");
     console.log(`Job ${job.id} succeeded.`);
