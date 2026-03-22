@@ -77,7 +77,6 @@ export async function runActions(
       }
     } else if (action.type === "FEEDBACK_COLLECTION") {
       const isFeedback =
-        lowerText.includes("experience") ||
         lowerText.includes("loved") ||
         lowerText.includes("amazing") ||
         lowerText.includes("delicious") ||
