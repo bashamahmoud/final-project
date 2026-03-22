@@ -14,6 +14,12 @@ export async function processNextJob() {
   try {
     const actions = await getActionsForPipeline(job.pipelineId);
 
+    if (actions.length === 0) {
+      throw new Error(
+        "No formatting actions attached to this pipeline. Add them via API!",
+      );
+    }
+
     const payload = job.payload as Record<string, unknown>;
 
     const actionParams = actions.map((a) => ({
@@ -28,11 +34,15 @@ export async function processNextJob() {
       resultPayload,
     });
 
-    await updateJobStatus(job.id, "succeeded");
+    if (resultPayload.category === "unclassified") {
+      await updateJobStatus(job.id, "ignored", "Message ignored: unclassified");
+      return true;
+    }
 
     await processDeliveries(job.id, job.pipelineId, resultPayload);
-
+    await updateJobStatus(job.id, "succeeded");
     console.log(`Job ${job.id} succeeded.`);
+
     return true;
   } catch (error) {
     console.error(`Job ${job.id} failed:`, error);

@@ -29,9 +29,6 @@ export async function processDeliveries(
     }
 
     if (!shouldDeliver) {
-      console.log(
-        `[Worker] Skipped delivery to subscriber ${subscriber.id} for job ${jobId} due to filter rules.`,
-      );
       continue;
     }
 
