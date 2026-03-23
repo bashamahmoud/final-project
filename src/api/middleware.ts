@@ -5,6 +5,7 @@ import {
   ForbiddenError,
   NotFoundError,
   UnauthorizedError,
+  InternalServerError,
 } from "./errors.js";
 
 export function middlewareLogResponses(
@@ -35,6 +36,9 @@ export function errorHandler(
     return res.status(403).json({ error: err.message });
   } else if (err instanceof NotFoundError) {
     return res.status(404).json({ error: err.message });
-  } else console.error("An error occurred:", err);
-  return res.status(500).json({ error: "Something went wrong on our end" });
+  } else if (err instanceof InternalServerError) {
+    return res.status(500).json({ error: err.message });
+  }
+
+  return _next(err);
 }

@@ -18,3 +18,8 @@ export class ForbiddenError extends Error {
     super(message);
   }
 }
+export class InternalServerError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
