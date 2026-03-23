@@ -22,7 +22,7 @@ export type NewPipeline = typeof pipelines.$inferInsert;
 export const pipelineActions = pgTable("pipeline_actions", {
   id: uuid("id").primaryKey().defaultRandom(),
   pipelineId: uuid("pipeline_id")
-    .references(() => pipelines.id)
+    .references(() => pipelines.id, { onDelete: "cascade" })
     .notNull(),
   order: integer("order").notNull(),
   type: varchar("type", { length: 255 }).notNull(),
@@ -30,20 +30,22 @@ export const pipelineActions = pgTable("pipeline_actions", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export type NewPipelineAction = typeof pipelineActions.$inferInsert;
+
 export const pipelineSubscribers = pgTable("pipeline_subscribers", {
   id: uuid("id").primaryKey().defaultRandom(),
   pipelineId: uuid("pipeline_id")
-    .references(() => pipelines.id)
+    .references(() => pipelines.id, { onDelete: "cascade" })
     .notNull(),
   targetUrl: text("target_url").notNull(),
   filters: jsonb("filters"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export type NewPipelineSubscriber = typeof pipelineSubscribers.$inferInsert;
+
 export const jobs = pgTable("jobs", {
   id: uuid("id").primaryKey().defaultRandom(),
   pipelineId: uuid("pipeline_id")
-    .references(() => pipelines.id)
+    .references(() => pipelines.id, { onDelete: "cascade" })
     .notNull(),
   payload: jsonb("payload").notNull(),
   status: varchar("status", { length: 50 }).notNull(),
@@ -53,22 +55,24 @@ export const jobs = pgTable("jobs", {
   processedAt: timestamp("processed_at"),
 });
 export type NewJob = typeof jobs.$inferInsert;
+
 export const jobResults = pgTable("job_results", {
   id: uuid("id").primaryKey().defaultRandom(),
   jobId: uuid("job_id")
-    .references(() => jobs.id)
+    .references(() => jobs.id, { onDelete: "cascade" })
     .notNull(),
   resultPayload: jsonb("result_payload").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 export type NewJobResult = typeof jobResults.$inferInsert;
+
 export const deliveryAttempts = pgTable("delivery_attempts", {
   id: uuid("id").primaryKey().defaultRandom(),
   jobId: uuid("job_id")
-    .references(() => jobs.id)
+    .references(() => jobs.id, { onDelete: "cascade" })
     .notNull(),
   subscriberId: uuid("subscriber_id")
-    .references(() => pipelineSubscribers.id)
+    .references(() => pipelineSubscribers.id, { onDelete: "cascade" })
     .notNull(),
   attemptNumber: integer("attempt_number").notNull(),
   status: varchar("status", { length: 50 }).notNull(),
