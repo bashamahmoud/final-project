@@ -1,13 +1,22 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { getPipelineByPathToken } from "../db/query/pipelines.js";
 import { enqueueJob } from "../db/query/jobs.js";
+import {
+  NotFoundError,
+  ForbiddenError,
+  InternalServerError,
+} from "./errors.js";
 
 export const webhooksRouter = Router();
 
 // Facebook verification route
 webhooksRouter.get(
   "/:token",
-  async (req: Request<{ token: string }>, res: Response) => {
+  async (
+    req: Request<{ token: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const mode = req.query["hub.mode"];
       const verifyToken = req.query["hub.verify_token"];
@@ -17,26 +26,31 @@ webhooksRouter.get(
         console.log(`[FB-Verify] Webhook verified successfully!`);
         res.status(200).send(challenge);
       } else {
-        console.error("[FB-Verify] Verification failed. Tokens didn't match.");
-        res.sendStatus(403);
+        throw new ForbiddenError("Verification failed. Tokens didn't match.");
       }
     } catch (error) {
       console.error("Error during webhook verification:", error);
-      res.status(500).send("Verification failed.");
+      if (error instanceof ForbiddenError) {
+        return next(error);
+      }
+      next(new InternalServerError("Verification failed."));
     }
   },
 );
 
 webhooksRouter.post(
   "/:token",
-  async (req: Request<{ token: string }>, res: Response) => {
+  async (
+    req: Request<{ token: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const { token } = req.params;
 
       const pipeline = await getPipelineByPathToken(token);
       if (!pipeline) {
-        res.status(404).json({ error: "Pipeline not found or invalid token." });
-        return;
+        throw new NotFoundError("Pipeline not found or invalid token.");
       }
 
       await enqueueJob({
@@ -50,7 +64,10 @@ webhooksRouter.post(
         .json({ message: "Webhook accepted and queued for processing." });
     } catch (error) {
       console.error("Error processing webhook:", error);
-      res.status(500).json({ error: "Failed to process incoming webhook." });
+      if (error instanceof NotFoundError) {
+        return next(error);
+      }
+      next(new InternalServerError("Failed to process incoming webhook."));
     }
   },
 );
