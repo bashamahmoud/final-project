@@ -1,0 +1,40 @@
+services:
+  # 1. The PostgreSQL Database Container
+  db:
+    image: postgres:15-alpine
+    container_name: final_project_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: final_project
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      # Natively pings the DB every 5 seconds until it answers
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # 2. The Node.js Webhook & Worker Container
+  app:
+    build: .
+    container_name: final_project_app
+    restart: on-failure
+    depends_on:
+      db:
+        # Crucial: The App entirely refuses to boot until Postgres is 100% verified healthy
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/final_project?sslmode=disable
+      - FB_VERIFY_TOKEN=my-secure-facebook-token
+      - platform=prod
+
+# The permanent hard drive for our Virtual Postgres Database
+volumes:
+  pgdata:
