@@ -9,7 +9,7 @@ import { BadRequestError, InternalServerError } from "./errors.js";
 export const actionsRouter = Router();
 
 actionsRouter.get(
-  "/pipeline/:pipelineId",
+  "/:pipelineId/actions",
   async (
     req: Request<{ pipelineId: string }>,
     res: Response,
@@ -26,15 +26,18 @@ actionsRouter.get(
 );
 
 actionsRouter.post(
-  "/",
-  async (req: Request, res: Response, next: NextFunction) => {
+  "/:pipelineId/actions",
+  async (
+    req: Request<{ pipelineId: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      const { pipelineId, order, type, config } = req.body;
+      const { pipelineId } = req.params;
+      const { order, type, config } = req.body;
 
-      if (!pipelineId || order === undefined || !type) {
-        throw new BadRequestError(
-          "Missing required fields: pipelineId, order, type",
-        );
+      if (order === undefined || !type) {
+        throw new BadRequestError("Missing required fields: order, type");
       }
 
       const newAction = await createAction({
@@ -56,8 +59,12 @@ actionsRouter.post(
 );
 
 actionsRouter.delete(
-  "/:id",
-  async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+  "/:pipelineId/actions/:id",
+  async (
+    req: Request<{ pipelineId: string; id: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       await deleteAction(req.params.id);
       res.status(204).send();
