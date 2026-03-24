@@ -22,6 +22,7 @@ app.get("/api/health", async (req, res, next) => {
   }
 });
 
+// Routes for creating and editing Pipelines
 app.use("/api/pipelines", async (req, res, next) => {
   try {
     await pipelinesRouter(req, res, next);
@@ -30,6 +31,7 @@ app.use("/api/pipelines", async (req, res, next) => {
   }
 });
 
+// External Entrypoint: Routes for incoming messages from Facebook/Discord
 app.use("/api/webhooks", async (req, res, next) => {
   try {
     await webhooksRouter(req, res, next);
@@ -38,6 +40,7 @@ app.use("/api/webhooks", async (req, res, next) => {
   }
 });
 
+// Routes for viewing past Jobs
 app.use("/api/pipelines", async (req, res, next) => {
   try {
     await jobsRouter(req, res, next);
@@ -46,6 +49,7 @@ app.use("/api/pipelines", async (req, res, next) => {
   }
 });
 
+// Routes for adding logic Actions to pipelines
 app.use("/api/pipelines", async (req, res, next) => {
   try {
     await actionsRouter(req, res, next);
@@ -54,6 +58,7 @@ app.use("/api/pipelines", async (req, res, next) => {
   }
 });
 
+// Routes for adding target destination Subscribers
 app.use("/api/pipelines", async (req, res, next) => {
   try {
     await subscribersRouter(req, res, next);
@@ -67,5 +72,6 @@ app.use(errorHandler);
 app.listen(Number(port), "0.0.0.0", () => {
   console.log(`Server is running at http://localhost:${port}`);
 
+  // Starts the infinite background loop that reads from the database jobs
   startWorker();
 });

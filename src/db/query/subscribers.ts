@@ -2,6 +2,7 @@ import { db } from "../index.js";
 import { pipelineSubscribers, NewPipelineSubscriber } from "../schema.js";
 import { eq } from "drizzle-orm";
 
+// Fetches all the destination URLs waiting to receive messages from this pipeline
 export async function getSubscribersByPipeline(pipelineId: string) {
   const results = await db
     .select()
@@ -10,11 +11,13 @@ export async function getSubscribersByPipeline(pipelineId: string) {
   return results;
 }
 
+// Adds a new destination URL with specific category filters
 export async function createSubscriber(data: NewPipelineSubscriber) {
   const result = await db.insert(pipelineSubscribers).values(data).returning();
   return result[0] || null;
 }
 
+// Removes a destination URL so it stops receiving webhooks
 export async function deleteSubscriber(id: string) {
   const result = await db
     .delete(pipelineSubscribers)

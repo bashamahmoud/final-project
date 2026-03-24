@@ -9,7 +9,11 @@ import {
 
 export const webhooksRouter = Router();
 
-// Facebook verification route
+/**
+ * A required method to verify the connection with the Facebook API.
+ * ---------------------
+ * Example Call: No need to call, its used by Facebook only for now.
+ */
 webhooksRouter.get(
   "/:token",
   async (
@@ -38,6 +42,13 @@ webhooksRouter.get(
   },
 );
 
+/**
+ * The main entrypoint! This is where external apps (like Facebook/Discord) POST data to trigger the pipeline.
+ * ---------------------
+ * Example Call: POST /api/webhooks/{token}
+ * Body Example: { "entry": [{ "messaging": [{ "message": { "text": "I need help" } }] }] }
+ * Note: It immediately responds with "202 Accepted" and queues the job for the background worker to handle.
+ */
 webhooksRouter.post(
   "/:token",
   async (

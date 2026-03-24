@@ -8,6 +8,11 @@ import { BadRequestError, InternalServerError } from "./errors.js";
 
 export const subscribersRouter = Router();
 
+/**
+ * List all destination subscribers attached to a specific pipeline
+ * ---------------------
+ * Example Call: GET /api/pipelines/{pipelineId}/subscribers
+ */
 subscribersRouter.get(
   "/:pipelineId/subscribers",
   async (
@@ -25,6 +30,13 @@ subscribersRouter.get(
   },
 );
 
+/**
+ * Add a new destination subscriber to a pipeline
+ * ---------------------
+ * Example Call: POST /api/pipelines/{pipelineId}/subscribers
+ * Body Example: { "targetUrl": "https://discord.com/api/webhooks/...", "filters": { "category": "support" } }
+ * Note: The filter 'category' must match a category created by an action, or 'unclassified'
+ */
 subscribersRouter.post(
   "/:pipelineId/subscribers",
   async (
@@ -59,6 +71,11 @@ subscribersRouter.post(
   },
 );
 
+/**
+ * Delete a specific destination subscriber
+ * ---------------------
+ * Example Call: DELETE /api/pipelines/{pipelineId}/subscribers/{id}
+ */
 subscribersRouter.delete(
   "/:pipelineId/subscribers/:id",
   async (
