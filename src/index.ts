@@ -38,7 +38,7 @@ app.use("/api/webhooks", async (req, res, next) => {
   }
 });
 
-app.use("/api/jobs", async (req, res, next) => {
+app.use("/api/pipelines", async (req, res, next) => {
   try {
     await jobsRouter(req, res, next);
   } catch (err) {
@@ -46,7 +46,7 @@ app.use("/api/jobs", async (req, res, next) => {
   }
 });
 
-app.use("/api/actions", async (req, res, next) => {
+app.use("/api/pipelines", async (req, res, next) => {
   try {
     await actionsRouter(req, res, next);
   } catch (err) {
@@ -54,7 +54,7 @@ app.use("/api/actions", async (req, res, next) => {
   }
 });
 
-app.use("/api/subscribers", async (req, res, next) => {
+app.use("/api/pipelines", async (req, res, next) => {
   try {
     await subscribersRouter(req, res, next);
   } catch (err) {

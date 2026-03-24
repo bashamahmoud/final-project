@@ -9,7 +9,7 @@ import { BadRequestError, InternalServerError } from "./errors.js";
 export const subscribersRouter = Router();
 
 subscribersRouter.get(
-  "/pipeline/:pipelineId",
+  "/:pipelineId/subscribers",
   async (
     req: Request<{ pipelineId: string }>,
     res: Response,
@@ -26,14 +26,19 @@ subscribersRouter.get(
 );
 
 subscribersRouter.post(
-  "/",
-  async (req: Request, res: Response, next: NextFunction) => {
+  "/:pipelineId/subscribers",
+  async (
+    req: Request<{ pipelineId: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
-      const { pipelineId, targetUrl, filters } = req.body;
+      const { pipelineId } = req.params;
+      const { targetUrl, filters } = req.body;
 
-      if (!pipelineId || !targetUrl || !filters) {
+      if (!targetUrl || !filters) {
         throw new BadRequestError(
-          "Missing required fields: pipelineId, targetUrl, filters",
+          "Missing required fields: targetUrl, filters",
         );
       }
 
@@ -55,8 +60,12 @@ subscribersRouter.post(
 );
 
 subscribersRouter.delete(
-  "/:id",
-  async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+  "/:pipelineId/subscribers/:id",
+  async (
+    req: Request<{ pipelineId: string; id: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       await deleteSubscriber(req.params.id);
       res.status(204).send();

@@ -10,7 +10,7 @@ import { NotFoundError, InternalServerError } from "./errors.js";
 export const jobsRouter = Router();
 
 jobsRouter.get(
-  "/pipeline/:pipelineId",
+  "/:pipelineId/jobs",
   async (
     req: Request<{ pipelineId: string }>,
     res: Response,
@@ -27,8 +27,12 @@ jobsRouter.get(
 );
 
 jobsRouter.get(
-  "/:id",
-  async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
+  "/:pipelineId/jobs/:id",
+  async (
+    req: Request<{ pipelineId: string; id: string }>,
+    res: Response,
+    next: NextFunction,
+  ) => {
     try {
       const job = await getJobById(req.params.id);
       if (!job) {
