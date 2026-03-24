@@ -11,6 +11,12 @@ import { NotFoundError, InternalServerError } from "./errors.js";
 
 export const pipelinesRouter = Router();
 
+/**
+ * Create a new pipeline
+ * ---------------------
+ * Example Call: POST /api/pipelines
+ * Body Example: { "name": "Support Router", "description": "Handles support tickets", "sourceSecret": "optional123" }
+ */
 pipelinesRouter.post(
   "/",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -38,6 +44,11 @@ pipelinesRouter.post(
   },
 );
 
+/**
+ * List all pipelines
+ * ---------------------
+ * Example Call: GET /api/pipelines
+ */
 pipelinesRouter.get(
   "/",
   async (req: Request, res: Response, next: NextFunction) => {
@@ -51,6 +62,11 @@ pipelinesRouter.get(
   },
 );
 
+/**
+ * Get a specific pipeline by its ID
+ * ---------------------
+ * Example Call: GET /api/pipelines/{id}
+ */
 pipelinesRouter.get(
   "/:id",
   async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
@@ -70,6 +86,12 @@ pipelinesRouter.get(
   },
 );
 
+/**
+ * Update an existing pipeline
+ * ---------------------
+ * Example Call: PUT /api/pipelines/{id}
+ * Body Example: { "name": "New Name", "description": "Updated description" }
+ */
 pipelinesRouter.put(
   "/:id",
   async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {
@@ -99,6 +121,11 @@ pipelinesRouter.put(
   },
 );
 
+/**
+ * Delete a pipeline (Warning: this cascades and deletes all its actions, subscribers, and jobs!)
+ * ---------------------
+ * Example Call: DELETE /api/pipelines/{id}
+ */
 pipelinesRouter.delete(
   "/:id",
   async (req: Request<{ id: string }>, res: Response, next: NextFunction) => {

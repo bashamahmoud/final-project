@@ -9,6 +9,12 @@ import { NotFoundError, InternalServerError } from "./errors.js";
 
 export const jobsRouter = Router();
 
+/**
+ * List all past processing jobs for a pipeline
+ * ---------------------
+ * Example Call: GET /api/pipelines/{pipelineId}/jobs
+ * Returns: Array of jobs with their status (queued, processing, succeeded, failed, ignored)
+ */
 jobsRouter.get(
   "/:pipelineId/jobs",
   async (
@@ -26,6 +32,12 @@ jobsRouter.get(
   },
 );
 
+/**
+ * Get the full details of a specific job
+ * ---------------------
+ * Example Call: GET /api/pipelines/{pipelineId}/jobs/{id}
+ * Returns: The job details, plus its processed payload result, plus all delivery attempts HTTP responses
+ */
 jobsRouter.get(
   "/:pipelineId/jobs/:id",
   async (

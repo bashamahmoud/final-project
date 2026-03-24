@@ -8,6 +8,11 @@ import { BadRequestError, InternalServerError } from "./errors.js";
 
 export const actionsRouter = Router();
 
+/**
+ * List all formatting actions attached to a specific pipeline
+ * ---------------------
+ * Example Call: GET /api/pipelines/{pipelineId}/actions
+ */
 actionsRouter.get(
   "/:pipelineId/actions",
   async (
@@ -25,6 +30,13 @@ actionsRouter.get(
   },
 );
 
+/**
+ * Add a new formatting action to a specific pipeline
+ * ---------------------
+ * Example Call: POST /api/pipelines/{pipelineId}/actions
+ * Body Example: { "order": 1, "type": "support" }
+ * Note: valid types are "reservation", "support", "feedback"
+ */
 actionsRouter.post(
   "/:pipelineId/actions",
   async (
@@ -58,6 +70,11 @@ actionsRouter.post(
   },
 );
 
+/**
+ * Delete a specific action
+ * ---------------------
+ * Example Call: DELETE /api/pipelines/{pipelineId}/actions/{id}
+ */
 actionsRouter.delete(
   "/:pipelineId/actions/:id",
   async (
