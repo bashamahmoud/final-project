@@ -8,8 +8,9 @@ export async function processDeliveries(
   jobId: string,
   pipelineId: string,
   payload: Record<string, unknown>,
-) {
+): Promise<number> {
   const subscribers = await getSubscribersByPipeline(pipelineId);
+  let deliveredCount = 0;
 
   for (const subscriber of subscribers) {
     let shouldDeliver = true;
@@ -32,6 +33,7 @@ export async function processDeliveries(
       continue;
     }
 
+    deliveredCount++;
     const attempt = await createDeliveryAttempt({
       jobId,
       subscriberId: subscriber.id,
@@ -76,4 +78,6 @@ export async function processDeliveries(
       });
     }
   }
+
+  return deliveredCount;
 }

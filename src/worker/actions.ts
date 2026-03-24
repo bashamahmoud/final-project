@@ -33,7 +33,7 @@ export async function runActions(
   }
 
   for (const action of actions) {
-    if (action.type === "RESERVATION") {
+    if (action.type === "reservation") {
       const isReservation =
         lowerText.includes("book") ||
         lowerText.includes("table") ||
@@ -54,7 +54,7 @@ export async function runActions(
           parsedAt: new Date().toISOString(),
         };
       }
-    } else if (action.type === "COMPLAINT_SUPPORT") {
+    } else if (action.type === "support") {
       const isSupport =
         lowerText.includes("complaint") ||
         lowerText.includes("bad") ||
@@ -75,7 +75,7 @@ export async function runActions(
           parsedAt: new Date().toISOString(),
         };
       }
-    } else if (action.type === "FEEDBACK_COLLECTION") {
+    } else if (action.type === "feedback") {
       const isFeedback =
         lowerText.includes("loved") ||
         lowerText.includes("amazing") ||

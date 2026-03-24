@@ -34,9 +34,30 @@ export async function processNextJob() {
       resultPayload,
     });
 
-    await processDeliveries(job.id, job.pipelineId, resultPayload);
-    await updateJobStatus(job.id, "succeeded");
-    console.log(`Job ${job.id} succeeded.`);
+    if (resultPayload.category === "unclassified") {
+      await updateJobStatus(job.id, "ignored", "Message ignored: unclassified");
+      return true;
+    }
+
+    const deliveredCount = await processDeliveries(
+      job.id,
+      job.pipelineId,
+      resultPayload,
+    );
+
+    if (deliveredCount === 0) {
+      await updateJobStatus(
+        job.id,
+        "failed",
+        `No subscriber matched category: ${String(resultPayload.category)}`,
+      );
+      console.log(
+        `Job ${job.id} failed: no matching subscriber for category '${String(resultPayload.category)}'.`,
+      );
+    } else {
+      await updateJobStatus(job.id, "succeeded");
+      console.log(`Job ${job.id} succeeded.`);
+    }
 
     return true;
   } catch (error) {
