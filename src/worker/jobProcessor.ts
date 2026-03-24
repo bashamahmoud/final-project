@@ -15,9 +15,15 @@ export async function processNextJob() {
     const actions = await getActionsForPipeline(job.pipelineId);
 
     if (actions.length === 0) {
-      throw new Error(
-        "No formatting actions attached to this pipeline. Add them via API!",
+      await updateJobStatus(
+        job.id,
+        "failed",
+        "No actions configured for this pipeline",
       );
+      console.log(
+        `Job ${job.id} failed: no actions configured for pipeline ${job.pipelineId}.`,
+      );
+      return true;
     }
 
     const payload = job.payload as Record<string, unknown>;
@@ -34,7 +40,10 @@ export async function processNextJob() {
       resultPayload,
     });
 
-    if (resultPayload.category === "unclassified") {
+    const isUnclassified = resultPayload.category === "unclassified";
+    const unclassifiedDefined = actions.some((a) => a.type === "unclassified");
+
+    if (isUnclassified && !unclassifiedDefined) {
       await updateJobStatus(job.id, "ignored", "Message ignored: unclassified");
       return true;
     }
