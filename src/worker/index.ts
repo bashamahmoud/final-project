@@ -1,4 +1,5 @@
 import { processNextJob } from "./jobProcessor.js";
+import { retryFailedDeliveries } from "./deliveryService.js";
 
 const WORKER_INTERVAL_MS = 5000;
 let isWorking = false;
@@ -11,10 +12,14 @@ export async function startWorker() {
 
     isWorking = true;
     try {
+      // Process all newly queued jobs first
       let hasJobs = true;
       while (hasJobs) {
         hasJobs = await processNextJob();
       }
+
+      // Then retry any failed delivery attempts that are now due
+      await retryFailedDeliveries();
     } catch (error) {
       console.error("[Worker] Error during polling loop:", error);
     } finally {

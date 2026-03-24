@@ -1,9 +1,48 @@
-import { getSubscribersByPipeline } from "../db/query/subscribers.js";
+import {
+  getSubscribersByPipeline,
+  getSubscriberById,
+} from "../db/query/subscribers.js";
 import {
   createDeliveryAttempt,
   updateDeliveryAttempt,
+  getPendingRetries,
 } from "../db/query/delivery.js";
+import { getJobResult } from "../db/query/jobs.js";
 
+// Shared helper: fires a single HTTP POST and logs the result on the attempt row
+async function sendToUrl(
+  attemptId: string,
+  targetUrl: string,
+  payload: unknown,
+  nextAttemptNum: number,
+) {
+  const nextRetryAt =
+    nextAttemptNum < 3 ? new Date(Date.now() + 5 * 60 * 1000) : null;
+  try {
+    const response = await fetch(targetUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const responseBody = await response.text();
+    await updateDeliveryAttempt(attemptId, {
+      status: response.ok ? "succeeded" : "failed",
+      responseStatusCode: response.status,
+      responseBody,
+      attemptNumber: nextAttemptNum,
+      nextRetryAt: response.ok ? null : nextRetryAt,
+    });
+  } catch (error) {
+    await updateDeliveryAttempt(attemptId, {
+      status: "failed",
+      errorMessage: error instanceof Error ? error.message : "Unknown error",
+      attemptNumber: nextAttemptNum,
+      nextRetryAt,
+    });
+  }
+}
+
+// Checks all subscribers for a pipeline, filters by category, and fires the initial delivery
 export async function processDeliveries(
   jobId: string,
   pipelineId: string,
@@ -13,24 +52,13 @@ export async function processDeliveries(
   let deliveredCount = 0;
 
   for (const subscriber of subscribers) {
-    let shouldDeliver = true;
-
+    // Skip subscribers whose filters don't match the payload
     if (subscriber.filters && typeof subscriber.filters === "object") {
       const filters = subscriber.filters as Record<string, unknown>;
-
-      if (Object.keys(filters).length > 0) {
-        const payloadMap = new Map(Object.entries(payload || {}));
-        for (const [key, expectedValue] of Object.entries(filters)) {
-          if (payloadMap.get(key) !== expectedValue) {
-            shouldDeliver = false;
-            break;
-          }
-        }
-      }
-    }
-
-    if (!shouldDeliver) {
-      continue;
+      const matches = Object.entries(filters).every(
+        ([k, v]) => payload[k] === v,
+      );
+      if (!matches) continue;
     }
 
     deliveredCount++;
@@ -40,44 +68,36 @@ export async function processDeliveries(
       attemptNumber: 1,
       status: "pending",
     });
-
-    if (!attempt) continue;
-
-    try {
-      const response = await fetch(subscriber.targetUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const responseBody = await response.text();
-
-      if (response.ok) {
-        await updateDeliveryAttempt(attempt.id, {
-          status: "succeeded",
-          responseStatusCode: response.status,
-          responseBody,
-        });
-      } else {
-        const nextRetryAt = new Date(Date.now() + 5 * 60 * 1000);
-        await updateDeliveryAttempt(attempt.id, {
-          status: "failed",
-          responseStatusCode: response.status,
-          responseBody,
-          nextRetryAt,
-        });
-      }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown network error";
-      const nextRetryAt = new Date(Date.now() + 5 * 60 * 1000);
-      await updateDeliveryAttempt(attempt.id, {
-        status: "failed",
-        errorMessage,
-        nextRetryAt,
-      });
-    }
+    if (attempt) await sendToUrl(attempt.id, subscriber.targetUrl, payload, 1);
   }
 
   return deliveredCount;
+}
+
+// Runs each worker tick — re-fires any failed delivery attempts that are now due
+export async function retryFailedDeliveries() {
+  const retries = await getPendingRetries();
+
+  for (const attempt of retries) {
+    const [subscriber, jobResult] = await Promise.all([
+      getSubscriberById(attempt.subscriberId),
+      getJobResult(attempt.jobId),
+    ]);
+
+    if (!subscriber || !jobResult) {
+      await updateDeliveryAttempt(attempt.id, {
+        status: "failed",
+        errorMessage: "Subscriber or job result no longer exists",
+        nextRetryAt: null,
+      });
+      continue;
+    }
+
+    await sendToUrl(
+      attempt.id,
+      subscriber.targetUrl,
+      jobResult.resultPayload,
+      attempt.attemptNumber + 1,
+    );
+  }
 }

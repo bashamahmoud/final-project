@@ -25,3 +25,13 @@ export async function deleteSubscriber(id: string) {
     .returning();
   return result[0] || null;
 }
+
+// Fetches a single subscriber by its ID — used by the retry worker to re-send failed deliveries
+export async function getSubscriberById(id: string) {
+  const result = await db
+    .select()
+    .from(pipelineSubscribers)
+    .where(eq(pipelineSubscribers.id, id))
+    .limit(1);
+  return result[0] || null;
+}
